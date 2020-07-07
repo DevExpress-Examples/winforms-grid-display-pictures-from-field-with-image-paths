@@ -1,5 +1,4 @@
-Imports Microsoft.VisualBasic
-Imports System
+﻿Imports System
 Imports System.Drawing
 Imports System.Collections
 Imports System.ComponentModel
@@ -7,6 +6,7 @@ Imports System.Windows.Forms
 Imports System.Data
 
 Imports DevExpress.XtraGrid.Views.Grid
+Imports System.Data.OleDb
 
 Namespace LoadExternalImages
 	''' <summary>
@@ -14,6 +14,7 @@ Namespace LoadExternalImages
 	''' </summary>
 	Public Class Form1
 		Inherits System.Windows.Forms.Form
+
 	  Private gridControl1 As DevExpress.XtraGrid.GridControl
 	  Private WithEvents gridView1 As DevExpress.XtraGrid.Views.Grid.GridView
 	  Private label1 As System.Windows.Forms.Label
@@ -43,7 +44,7 @@ Namespace LoadExternalImages
 		''' <summary>
 		''' Clean up any resources being used.
 		''' </summary>
-		Protected Overrides Overloads Sub Dispose(ByVal disposing As Boolean)
+		Protected Overrides Sub Dispose(ByVal disposing As Boolean)
 			If disposing Then
 				If components IsNot Nothing Then
 					components.Dispose()
@@ -67,10 +68,10 @@ Namespace LoadExternalImages
 			Me.columnImage = New DevExpress.XtraGrid.Columns.GridColumn()
 			Me.repositoryItemPictureEdit1 = New DevExpress.XtraEditors.Repository.RepositoryItemPictureEdit()
 			Me.label1 = New System.Windows.Forms.Label()
-			CType(Me.gridControl1, System.ComponentModel.ISupportInitialize).BeginInit()
-			CType(Me.gridView1, System.ComponentModel.ISupportInitialize).BeginInit()
-			CType(Me.repositoryItemComboBox1, System.ComponentModel.ISupportInitialize).BeginInit()
-			CType(Me.repositoryItemPictureEdit1, System.ComponentModel.ISupportInitialize).BeginInit()
+			DirectCast(Me.gridControl1, System.ComponentModel.ISupportInitialize).BeginInit()
+			DirectCast(Me.gridView1, System.ComponentModel.ISupportInitialize).BeginInit()
+			DirectCast(Me.repositoryItemComboBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+			DirectCast(Me.repositoryItemPictureEdit1, System.ComponentModel.ISupportInitialize).BeginInit()
 			Me.SuspendLayout()
 			' 
 			' gridControl1
@@ -94,7 +95,8 @@ Namespace LoadExternalImages
 			Me.gridView1.Name = "gridView1"
 			Me.gridView1.OptionsView.ShowGroupPanel = False
 			Me.gridView1.RowHeight = 33
-'			Me.gridView1.CustomUnboundColumnData += New DevExpress.XtraGrid.Views.Base.CustomColumnDataEventHandler(Me.gridView1_CustomUnboundColumnData);
+'INSTANT VB NOTE: The following InitializeComponent event wireup was converted to a 'Handles' clause:
+'ORIGINAL LINE: this.gridView1.CustomUnboundColumnData += new DevExpress.XtraGrid.Views.Base.CustomColumnDataEventHandler(this.gridView1_CustomUnboundColumnData);
 			' 
 			' columnID
 			' 
@@ -166,10 +168,10 @@ Namespace LoadExternalImages
 			Me.Controls.Add(Me.label1)
 			Me.Name = "Form1"
 			Me.Text = "Form1"
-			CType(Me.gridControl1, System.ComponentModel.ISupportInitialize).EndInit()
-			CType(Me.gridView1, System.ComponentModel.ISupportInitialize).EndInit()
-			CType(Me.repositoryItemComboBox1, System.ComponentModel.ISupportInitialize).EndInit()
-			CType(Me.repositoryItemPictureEdit1, System.ComponentModel.ISupportInitialize).EndInit()
+			DirectCast(Me.gridControl1, System.ComponentModel.ISupportInitialize).EndInit()
+			DirectCast(Me.gridView1, System.ComponentModel.ISupportInitialize).EndInit()
+			DirectCast(Me.repositoryItemComboBox1, System.ComponentModel.ISupportInitialize).EndInit()
+			DirectCast(Me.repositoryItemPictureEdit1, System.ComponentModel.ISupportInitialize).EndInit()
 			Me.ResumeLayout(False)
 
 		End Sub
@@ -178,7 +180,7 @@ Namespace LoadExternalImages
 		''' <summary>
 		''' The main entry point for the application.
 		''' </summary>
-		<STAThread> _
+		<STAThread>
 		Shared Sub Main()
 			Application.Run(New Form1())
 		End Sub
@@ -188,8 +190,9 @@ Namespace LoadExternalImages
 			If DBFileName <> "" Then
 				Dim ds As New DataSet()
 				Dim con As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & DBFileName
-				Dim oleDbDataAdapter As New System.Data.OleDb.OleDbDataAdapter("SELECT * FROM PeopleColors", con)
-				oleDbDataAdapter.Fill(ds, "PeopleColors")
+				Using oleDbDataAdapter As New OleDbDataAdapter("SELECT * FROM PeopleColors", con)
+					oleDbDataAdapter.Fill(ds, "PeopleColors")
+				End Using
 				gridControl1.DataSource = ds.Tables("PeopleColors")
 			End If
 		End Sub
@@ -208,9 +211,9 @@ Namespace LoadExternalImages
 			If e.Column.FieldName = "Image" AndAlso e.IsGetData Then
 				Dim view As GridView = TryCast(sender, GridView)
 
-				Dim colorName As String = CStr((CType(e.Row, DataRowView))("Color"))
+				Dim colorName As String = CStr(CType(e.Row, DataRowView)("Color"))
 				Dim fileName As String = GetFileName(colorName).ToLower()
-				If (Not Images.ContainsKey(fileName)) Then
+				If Not Images.ContainsKey(fileName) Then
 					Dim img As Image = Nothing
 					Try
 						Dim filePath As String = DevExpress.Utils.FilesHelper.FindingFileName(Application.StartupPath, ImageDir & fileName, False)
