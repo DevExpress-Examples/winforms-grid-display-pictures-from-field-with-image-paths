@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Data;
 
 using DevExpress.XtraGrid.Views.Grid;
+using System.Data.OleDb;
 
 namespace LoadExternalImages {
 	/// <summary>
@@ -209,8 +210,8 @@ namespace LoadExternalImages {
 			if(DBFileName != "") {
 				DataSet ds = new DataSet();
 				string con = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + DBFileName;
-				System.Data.OleDb.OleDbDataAdapter oleDbDataAdapter = new System.Data.OleDb.OleDbDataAdapter("SELECT * FROM PeopleColors", con);
-				oleDbDataAdapter.Fill(ds, "PeopleColors");
+                using(var oleDbDataAdapter = new OleDbDataAdapter("SELECT * FROM PeopleColors", con))
+                    oleDbDataAdapter.Fill(ds, "PeopleColors");
 				gridControl1.DataSource = ds.Tables["PeopleColors"];
 			}
 		}
